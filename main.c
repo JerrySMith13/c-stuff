@@ -6,9 +6,19 @@ A user-friendly CLI utility to print file information
 #include <sys/stat.h>
 //Included for getting file descriptor
 #include <fcntl.h>
+//Included for getting time formatting
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+
+//Must be freed
+void time_formatted(time_t time, char* buf, size_t maxsize){
+    struct tm* time_f;
+    time_f = localtime(&time);
+    char* time_format = malloc(sizeof(char) * 21);
+    strftime(buf, maxsize, "%Y-%m-%d %H:%M:%S", time_f);
+}
 
 //This string MUST BE FREED
 char* size_formatted(off_t st_size){
@@ -39,7 +49,6 @@ char* size_formatted(off_t st_size){
     }
 
     return buf;
-    
 
 }
 
@@ -67,14 +76,16 @@ int main(int nargs, char** args){
     }
     
     char* restrict filesize_formatted = size_formatted(file_stat.st_size);
-
+    char birth_time[21];
+    time_formatted(file_stat.st_birthtimespec.tv_sec, birth_time, 21);
     printf("Info for: %s\n", args[1]);
 
     //Print full path
     printf("Full path: %s\n", canonizalized); 
     //Print size
     printf("Size: %s\n", filesize_formatted);
-    //Print date-time created
+    //Print date-time accessed
+    printf("Time of creation: %s", birth_time);
     //Print date-time of last modification
     //Print permissions
 
