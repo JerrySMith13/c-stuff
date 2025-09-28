@@ -10,7 +10,14 @@ A user-friendly CLI utility to print file information
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
+
+//This pointer must be freed
+char* read_permissions(mode_t permissions){
+    
+
+}
 
 //Must be freed
 void time_formatted(time_t time, char* buf, size_t maxsize){
@@ -77,17 +84,29 @@ int main(int nargs, char** args){
     
     char* restrict filesize_formatted = size_formatted(file_stat.st_size);
     char birth_time[21];
+    char access_time[21];
+    char modify_time[21];
     time_formatted(file_stat.st_birthtimespec.tv_sec, birth_time, 21);
+    time_formatted(file_stat.st_atimespec.tv_sec, access_time, 21);
+    time_formatted(file_stat.st_mtimespec.tv_sec, modify_time, 21);
+
+    
+
     printf("Info for: %s\n", args[1]);
 
     //Print full path
-    printf("Full path: %s\n", canonizalized); 
+    printf("Path: %s\n", canonizalized); 
     //Print size
     printf("Size: %s\n", filesize_formatted);
-    //Print date-time accessed
-    printf("Time of creation: %s", birth_time);
-    //Print date-time of last modification
+    //Print date-time created
+    printf("Created: %s\n", birth_time);
+    //Print date-time of last access
+    printf("Accessed: %s\n", access_time);
+    printf("Modified: %s\n", modify_time);
     //Print permissions
+
+    
+
 
     free(canonizalized);
     free(filesize_formatted);
