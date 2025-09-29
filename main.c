@@ -8,6 +8,12 @@ A user-friendly CLI utility to print file information
 #include <fcntl.h>
 //Included for getting time formatting
 #include <time.h>
+//Included for UID and GID
+#include <pwd.h>
+#include <grp.h>
+
+#include <sys/types.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -115,19 +121,31 @@ int main(int nargs, char** args){
     time_formatted(file_stat.st_mtimespec.tv_sec, modify_time, 21);
 
     char* ftype = file_type(file_stat.st_mode);
+
+    struct passwd* user;
+    user = getpwuid(file_stat.st_uid);
+    char* username = user->pw_name;
+
+    struct group* group;
+    group = getgrgid(file_stat.st_gid);
+    char* groupname = group->gr_name;
+    
     
 
-    printf("Info for: %s\n", args[1]);
+    printf("Info for: %s\t\t\t", args[1]);
+    printf("Permission info\n");
 
     //Print file type
-    printf("File type: %s\n", ftype);
+    printf("File type: %s\t\t", ftype);
+    printf("Owner: %s\n", username);
 
     //Print full path
-    printf("Path: %s\n", canonizalized); 
+    printf("Path: %s\t\t\t", canonizalized); 
+    printf("Group: %s\n", groupname);
     //Print size
     printf("Size: %s\n", filesize_formatted);
     //Print date-time created
-    printf("Created: %s\n", status_time);
+    printf("Status changed: %s\n", status_time);
     //Print date-time of last access
     printf("Accessed: %s\n", access_time);
     printf("Modified: %s\n", modify_time);
