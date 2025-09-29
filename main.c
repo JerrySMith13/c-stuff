@@ -13,13 +13,37 @@ A user-friendly CLI utility to print file information
 #include <stdbool.h>
 
 
-//This pointer must be freed
-char* read_permissions(mode_t permissions){
-    
 
+//This pointer lives on the stack, so DO NOT FREE
+char* file_type(mode_t permissions){
+    
+    if (S_ISREG(permissions)){
+        return "Regular File";
+    }
+    else if S_ISDIR(permissions){
+        return "Directory";
+    }
+    else if S_ISBLK(permissions){
+        return "Block File";
+    }
+    else if S_ISCHR(permissions){
+        return "Character File";
+    }
+    else if S_ISFIFO(permissions){
+        return "FIFO File";
+    }
+    else if S_ISLNK(permissions){
+        return "Link File";
+    }
+    else if S_ISSOCK(permissions){
+        return "Socket File";
+    }
+    else{
+        return "Unknown";
+    }
 }
 
-//Must be freed
+//Must be freed if allocated
 void time_formatted(time_t time, char* buf, size_t maxsize){
     struct tm* time_f;
     time_f = localtime(&time);
@@ -83,23 +107,27 @@ int main(int nargs, char** args){
     }
     
     char* restrict filesize_formatted = size_formatted(file_stat.st_size);
-    char birth_time[21];
+    char status_time[21];
     char access_time[21];
     char modify_time[21];
-    time_formatted(file_stat.st_birthtimespec.tv_sec, birth_time, 21);
+    time_formatted(file_stat.st_ctimespec.tv_sec, status_time, 21);
     time_formatted(file_stat.st_atimespec.tv_sec, access_time, 21);
     time_formatted(file_stat.st_mtimespec.tv_sec, modify_time, 21);
 
+    char* ftype = file_type(file_stat.st_mode);
     
 
     printf("Info for: %s\n", args[1]);
+
+    //Print file type
+    printf("File type: %s\n", ftype);
 
     //Print full path
     printf("Path: %s\n", canonizalized); 
     //Print size
     printf("Size: %s\n", filesize_formatted);
     //Print date-time created
-    printf("Created: %s\n", birth_time);
+    printf("Created: %s\n", status_time);
     //Print date-time of last access
     printf("Accessed: %s\n", access_time);
     printf("Modified: %s\n", modify_time);
